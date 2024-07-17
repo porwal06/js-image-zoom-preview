@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Image Zoom with Preview</title>
+    <style>
+        .container {
+            position: relative;
+            width: 600px;
+            height: 600px;
+        }
+        .zoom-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            cursor: crosshair;
+        }
+        .preview-container {
+            position: fixed;
+            bottom: 0px;
+            right: 10px;
+            width: 200px;
+            height: 200px;
+            border: 2px solid #000;
+            overflow: hidden;
+        }
+        .preview-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .preview-lens {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 2px solid red;
+            pointer-events: none;
+            background: rgba(255, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img id="zoom-image" src="high-res-image.jpg" class="zoom-image" alt="Zoom Image">
+        <div class="preview-container">
+            <img id="preview-image" src="small-image.jpg" class="preview-image" alt="Preview Image">
+            <div id="preview-lens" class="preview-lens"></div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script>
+        $(document).ready(function() {
+            const zoomImage = $('#zoom-image');
+            const previewImage = $('#preview-image');
+            const previewLens = $('#preview-lens');
+            const previewContainer = $('.preview-container');
+            const lensSize = 20;
+
+            zoomImage.on('mousemove', function(e) {
+                const zoomImageOffset = zoomImage.offset();
+                const mouseX = e.pageX - zoomImageOffset.left;
+                const mouseY = e.pageY - zoomImageOffset.top;
+                const zoomImageWidth = zoomImage.width();
+                const zoomImageHeight = zoomImage.height();
+                const scaleX = zoomImage[0].naturalWidth / zoomImageWidth;
+                const scaleY = zoomImage[0].naturalHeight / zoomImageHeight;
+
+                let lensX = mouseX - lensSize / 2;
+                let lensY = mouseY - lensSize / 2;
+
+                if (lensX < 0) lensX = 0;
+                if (lensY < 0) lensY = 0;
+                if (lensX > zoomImageWidth - lensSize) lensX = zoomImageWidth - lensSize;
+                if (lensY > zoomImageHeight - lensSize) lensY = zoomImageHeight - lensSize;
+
+                const lensLeft = lensX * 200 / zoomImageWidth;
+                const lensTop = lensY * 200 / zoomImageHeight;
+
+                previewLens.css({ left: lensLeft, top: lensTop });
+            });
+
+            zoomImage.on('mouseleave', function() {
+                previewLens.hide();
+            });
+
+            zoomImage.on('mouseenter', function() {
+                previewLens.show();
+            });
+        });
+    </script>
+</body>
+</html>
